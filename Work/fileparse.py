@@ -4,17 +4,18 @@
 
 import csv
 
-def parse_csv(filename, select=None, types = None, has_headers=True, delimiter = ','):
+def parse_csv(filename, select=None, types=None, has_headers=True, delimiter = ',',silence_errors=False):
 	'''
 	Parse a CSV file into a list of records
 	'''
-	
+	if select and not has_headers:
+		raise RuntimeError('Select argument requires column headers.')
 	with open(filename) as f:
 		rows = csv.reader(f, delimiter=delimiter)
 
 		# Read the file headers
-#		if has_headers == True: #My Code#
-#			headers = next(rows)
+		#if has_headers == True: #My Code#
+		#headers = next(rows)
 		headers = next(rows) if has_headers else [] #Solution given#
 		
 		# If specific columns have been selected, make indices for filtering.
@@ -25,7 +26,7 @@ def parse_csv(filename, select=None, types = None, has_headers=True, delimiter =
 			indices = []
 
 		records = []
-		for row in rows:
+		for rownum, row in enumerate(rows, 1):
 			if not row:
 				continue
 			
@@ -33,8 +34,13 @@ def parse_csv(filename, select=None, types = None, has_headers=True, delimiter =
 				row = [ row[index] for index in indices ]
 
 			if types:
-				row = [ func(val) for func, val in zip(types, row) ]
-
+				try:
+					row = [ func(val) for func, val in zip(types, row) ]
+				except ValueError as e:
+					if not silence_errors:
+						print(f'Row {rownum}: Could not convert {row}')
+						print(f'Row {rownum}: Reason {e}')
+					continue
 			if has_headers == True:
 				record = dict(zip(headers, row))
 			else:
