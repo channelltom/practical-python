@@ -3,30 +3,28 @@
 # Exercise 1.27
 
 import csv
+import report
 import sys
+from stock import Stock
+
 def portfolio_cost(filename):
-    total_cost = 0.0
+    ''' 
+    Computes the total cost (shares*price) of a portfolio file.
+    '''
+    portfolio = report.read_portfolio(filename)
+    return sum([s.cost() for s in portfolio])
 
-    with open(filename, 'rt') as f:
-        rows=csv.reader(f)
-        headers = next(rows)
-        for line in f:
-            row=line.split(',')
-            for rowno, row in enumerate(rows, start=1):
-                record = dict(zip(headers, row))
-                try:
-                    n_shares = int(record['shares'])
-                    share_cost = float(record['price'])
-                    total_cost += n_shares * share_cost
-                except ValueError:
-                    print(f'Row {rowno}: Could not convert {row}')
-                    
-    return total_cost
+#if len(sys.argv) == 2:
+#    filename = sys.argv[1]
+#else:
+#    filename = input('Enter a filename: ')
 
-if len(sys.argv) == 2:
-    filename = sys.argv[1]
-else:
-    filename = input('Enter a filename: ')
+def main(args):
+    if len(args) != 2:
+        SystemExit('Usage: %s portfile' % args[0])
+    cost = portfolio_cost(args[1])
+    print('Total Cost:', cost)
 
-cost = portfolio_cost(filename)
-print('Total Cost:', cost)
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
