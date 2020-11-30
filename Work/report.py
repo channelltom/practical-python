@@ -1,7 +1,3 @@
-# report.py
-#
-# Exercise 2.4
-
 import csv
 import fileparse
 from stock import Stock
@@ -22,6 +18,7 @@ def read_prices(filename):
 	'''
 	with open(filename) as lines:
 		return dict(fileparse.parse_csv(lines, types=[str, float], has_headers=False))
+
 
 def make_report_data(portfolio, prices):
 	'''
